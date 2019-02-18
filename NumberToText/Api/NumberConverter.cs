@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 
 namespace NumberToText.Api
@@ -19,24 +20,31 @@ namespace NumberToText.Api
             {new Tuple<long, string>(100,  "hundred"  ) },
         };
 
-        private static long getSingleNumberValue(string word)
+        private static long getWordNumberValue(string strinNumber)
         {
-            if (numbersUntil19.Contains(word))
-                return numbersUntil19.IndexOf(word);
+            if (numbersUntil19.Contains(strinNumber))
+                return numbersUntil19.IndexOf(strinNumber);
 
-            if (numbers10Powers.Contains(word))
-                return numbers10Powers.IndexOf(word) * 10;
+            if (numbers10Powers.Contains(strinNumber))
+                return numbers10Powers.IndexOf(strinNumber) * 10;
 
             foreach (var item in numberSteps)
             {
-                if (item.Item2 == word)
+                if (item.Item2 == strinNumber)
                 {
                     return item.Item1;
                 }
             }
 
+            List<string> wordList = strinNumber.Split(' ').ToList();
+            if (wordList.Count == 2 && numbers10Powers.Exists(a => a == wordList[0]) && numbersUntil19.Exists(b => b == wordList[1]))//fifty one
+            {
+                return numbers10Powers.IndexOf(wordList[0]) * 10 + numbersUntil19.IndexOf(wordList[1]);
+            }
+
             return -1;
         }
+
         public static string NumberToText(long number)
         {
             string convertedNumberInWords = "";
@@ -85,45 +93,60 @@ namespace NumberToText.Api
         static String[] spliter = new String[] {
         "tỉ", "triệu", "nghìn", "trăm", "mươi", "mười", "linh", "lẻ"};
 
-        public static long WordsToNumber(String words)
+        public static long TextToNumber(String textNumber)
         {
-            if (words == "")
-                return -1;
-            long result = 0, temp;
-            int pos = -1;
-            bool found = false;
-            StringBuilder strBuild = new StringBuilder(words);
-
-            foreach (var s in numberSteps)
+            textNumber = textNumber.Trim().ToLower();
+            string minus = "minus";
+            if (textNumber.StartsWith(minus))
             {
-                pos = words.IndexOf(s.Item2);
-                if (pos >= 0)
+                string textNumberWithoutMinus = textNumber.Substring(minus.Length, textNumber.Length - minus.Length).Trim();
+                return -textToNumberConverter(textNumberWithoutMinus);
+            }
+            return textToNumberConverter(textNumber);
+        }
+
+        private static long textToNumberConverter(String textNumber)
+        {
+            if (textNumber == "")
+                return -1;
+
+            long result = 0;
+            long tempVal;
+            bool stepFound = false;
+
+            foreach (var step in numberSteps)
+            {
+                StringBuilder wordStrBuilder = new StringBuilder(textNumber);
+                int sIdx = -1;
+                sIdx = textNumber.IndexOf(step.Item2);
+                if (sIdx >= 0)
                 {
-                    found = true;
-                    temp = WordsToNumber(words.Substring(0, pos).Trim());
-                    if (temp == -1)
-                        result += getSingleNumberValue(s.Item2);
+                    stepFound = true;
+                    tempVal = textToNumberConverter(textNumber.Substring(0, sIdx).Trim());
+                    if (tempVal == -1)
+                        result += getWordNumberValue(step.Item2);
                     else
-                        result += temp * getSingleNumberValue(s.Item2);
-                    strBuild = strBuild.Remove(0, pos + s.Item2.Length);
-                    while (strBuild.ToString().IndexOf(s.Item2) >= 0)
+                        result += tempVal * getWordNumberValue(step.Item2);
+                    wordStrBuilder = wordStrBuilder.Remove(0, sIdx + step.Item2.Length);
+
+                    while (wordStrBuilder.ToString().IndexOf(step.Item2) >= 0)
                     {
-                        result *= getSingleNumberValue(s.Item2);
-                        strBuild.Remove(0, strBuild.ToString().IndexOf(s.Item2) + s.Item2.Length);
+                        result *= getWordNumberValue(step.Item2);
+                        wordStrBuilder.Remove(0, wordStrBuilder.ToString().IndexOf(step.Item2) + step.Item2.Length);
                     }
-                    words = strBuild.ToString();
+                    textNumber = wordStrBuilder.ToString();
                 }
-                if (words == "")
+                if (textNumber == "")
                     return result;
             }
 
-            if (!found)
-                return getSingleNumberValue(words);
+            if (!stepFound)
+                return getWordNumberValue(textNumber);
             else
             {
-                temp = WordsToNumber(words.Trim());
-                if (temp != -1)
-                    result += temp;
+                tempVal = textToNumberConverter(textNumber.Trim());
+                if (tempVal != -1)
+                    result += tempVal;
             }
 
             return result;
