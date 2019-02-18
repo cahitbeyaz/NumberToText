@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>utils.NumberToText</id>
+    <version>1.0.0</version>
+    <title>Number To Text and Text To Number Converter</title>
+    <authors>cahit-beyaz</authors>
+    <owners>cahit-beyaz</owners>
+    <projectUrl>https://github.com/cahitbeyaz/NumberToText</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>NumberToText is small utility project for converting numbers or money amount to english words and vice versa. </description>
+    <copyright>Copyright 2019</copyright>
+    <tags>MoneyConverter TextToNumber NumberToText</tags>
+  </metadata>
+  <files>
+    <file src="bin\Release\netstandard1.0\NumberToText.dll" target="lib\" />
+  </files>
+</package>
