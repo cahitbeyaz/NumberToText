@@ -28,7 +28,7 @@ Convert money text back to number:
 
 Test Result:
 Calculating coverage result...
-Generating report 'C:\Users\cahitb1\cb\projects\ty\NumberToText\NumberToText.Test\coverage.json'
+
 
     +--------------------------------------------------+--------+--------+--------+
     | Module                                           | Line   | Branch | Method |
