@@ -90,9 +90,6 @@ namespace NumberToText.Api
             return moneyText;
         }
 
-        static String[] spliter = new String[] {
-        "tỉ", "triệu", "nghìn", "trăm", "mươi", "mười", "linh", "lẻ"};
-
         public static long TextToNumber(String textNumber)
         {
             textNumber = textNumber.Trim().ToLower();
